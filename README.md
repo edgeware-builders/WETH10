@@ -7,6 +7,9 @@ This [twitter hackathon project 🐦](https://twitter.com/r_ross_campbell/status
 
 [Kovan testnet deployment](https://kovan.etherscan.io/address/0xA243FEB70BaCF6cD77431269e68135cf470051b4) of commit ([8d30910](https://github.com/WETH10/WETH10/commit/8d309101c6d8483cc289d656054cadda2de156fe)) 🔨.
 
+
+## Beresheet deployment
+To deploy on beresheet set private key in environment variable PRIVATE_KEY and run ```truffle deploy --network beresheet```
 ## Total Supply
 The supply of WETH10 is capped at `type(uint112).max`.
 

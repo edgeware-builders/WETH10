@@ -18,7 +18,7 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
@@ -47,6 +47,10 @@ module.exports = {
      port: 7540,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
     },
+    beresheet: {
+      provider: new HDWalletProvider([process.env.PRIVATE_KEY], 'http://beresheet1.edgewa.re:9933'),
+      network_id: 2021
+    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
