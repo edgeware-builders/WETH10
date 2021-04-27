@@ -65,6 +65,12 @@ module.exports = {
       accounts,
       url: nodeUrl('ropsten')
     },
+    beresheet_local: {
+      accounts: ['0x1111111111111111111111111111111111111111111111111111111111111111'],
+      url: `http://localhost:9933`,
+      gasPrice: 10000000,
+      gasLimit: 10000000
+    },
     mainnet: {
       accounts,
       url: nodeUrl('mainnet'),
