@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 require('@nomiclabs/hardhat-etherscan')
 require('@nomiclabs/hardhat-truffle5')
+require("@nomiclabs/hardhat-waffle")
 require('solidity-coverage')
 require('hardhat-gas-reporter')
 require('hardhat-deploy')
@@ -48,6 +49,14 @@ if (!etherscanKey) {
 module.exports = {
   defaultNetwork: 'hardhat',
   networks: {
+    beresheet: {
+      accounts,
+      url: 'https://beresheet10.edgewa.re/evm',
+    },
+    edgeware: {
+      accounts,
+      url: 'http://mainnet10.edgewa.re:9933',
+    },
     kovan: {
       accounts,
       url: nodeUrl('kovan'),

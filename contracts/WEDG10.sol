@@ -3,7 +3,7 @@
 // Adapted by Ethereum Community 2021
 pragma solidity 0.7.6;
 
-import "./interfaces/IWETH10.sol";
+import "./interfaces/IWEDG10.sol";
 import "erc3156/contracts/interfaces/IERC3156FlashBorrower.sol";
 
 interface ITransferReceiver {
@@ -14,13 +14,13 @@ interface IApprovalReceiver {
     function onTokenApproval(address, uint, bytes calldata) external returns (bool);
 }
 
-/// @dev Wrapped Ether v10 (WETH10) is an Ether (ETH) ERC-20 wrapper. You can `deposit` ETH and obtain a WETH10 balance which can then be operated as an ERC-20 token. You can
-/// `withdraw` ETH from WETH10, which will then burn WETH10 token in your wallet. The amount of WETH10 token in any wallet is always identical to the
+/// @dev Wrapped Ether v10 (WEDG10) is an Ether (ETH) ERC-20 wrapper. You can `deposit` ETH and obtain a WEDG10 balance which can then be operated as an ERC-20 token. You can
+/// `withdraw` ETH from WEDG10, which will then burn WEDG10 token in your wallet. The amount of WEDG10 token in any wallet is always identical to the
 /// balance of ETH deposited minus the ETH withdrawn with that specific wallet.
-contract WETH10 is IWETH10 {
+contract WEDG10 is IWEDG10 {
 
-    string public constant name = "Wrapped Ether v10";
-    string public constant symbol = "WETH10";
+    string public constant name = "Wrapped Edgeware v10";
+    string public constant symbol = "WEDG10";
     uint8  public constant decimals = 18;
 
     bytes32 public immutable CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
@@ -28,17 +28,17 @@ contract WETH10 is IWETH10 {
     uint256 public immutable deploymentChainId;
     bytes32 private immutable _DOMAIN_SEPARATOR;
 
-    /// @dev Records amount of WETH10 token owned by account.
+    /// @dev Records amount of WEDG10 token owned by account.
     mapping (address => uint256) public override balanceOf;
 
     /// @dev Records current ERC2612 nonce for account. This value must be included whenever signature is generated for {permit}.
     /// Every successful call to {permit} increases account's nonce by one. This prevents signature from being used multiple times.
     mapping (address => uint256) public override nonces;
 
-    /// @dev Records number of WETH10 token that account (second) will be allowed to spend on behalf of another account (first) through {transferFrom}.
+    /// @dev Records number of WEDG10 token that account (second) will be allowed to spend on behalf of another account (first) through {transferFrom}.
     mapping (address => mapping (address => uint256)) public override allowance;
 
-    /// @dev Current amount of flash-minted WETH10 token.
+    /// @dev Current amount of flash-minted WEDG10 token.
     uint256 public override flashMinted;
     
     constructor() {
@@ -68,36 +68,36 @@ contract WETH10 is IWETH10 {
         return chainId == deploymentChainId ? _DOMAIN_SEPARATOR : _calculateDomainSeparator(chainId);
     }
     
-    /// @dev Returns the total supply of WETH10 token as the ETH held in this contract.
+    /// @dev Returns the total supply of WEDG10 token as the ETH held in this contract.
     function totalSupply() external view override returns (uint256) {
         return address(this).balance + flashMinted;
     }
 
-    /// @dev Fallback, `msg.value` of ETH sent to this contract grants caller account a matching increase in WETH10 token balance.
-    /// Emits {Transfer} event to reflect WETH10 token mint of `msg.value` from `address(0)` to caller account.
+    /// @dev Fallback, `msg.value` of ETH sent to this contract grants caller account a matching increase in WEDG10 token balance.
+    /// Emits {Transfer} event to reflect WEDG10 token mint of `msg.value` from `address(0)` to caller account.
     receive() external payable {
         // _mintTo(msg.sender, msg.value);
         balanceOf[msg.sender] += msg.value;
         emit Transfer(address(0), msg.sender, msg.value);
     }
 
-    /// @dev `msg.value` of ETH sent to this contract grants caller account a matching increase in WETH10 token balance.
-    /// Emits {Transfer} event to reflect WETH10 token mint of `msg.value` from `address(0)` to caller account.
+    /// @dev `msg.value` of ETH sent to this contract grants caller account a matching increase in WEDG10 token balance.
+    /// Emits {Transfer} event to reflect WEDG10 token mint of `msg.value` from `address(0)` to caller account.
     function deposit() external override payable {
         // _mintTo(msg.sender, msg.value);
         balanceOf[msg.sender] += msg.value;
         emit Transfer(address(0), msg.sender, msg.value);
     }
 
-    /// @dev `msg.value` of ETH sent to this contract grants `to` account a matching increase in WETH10 token balance.
-    /// Emits {Transfer} event to reflect WETH10 token mint of `msg.value` from `address(0)` to `to` account.
+    /// @dev `msg.value` of ETH sent to this contract grants `to` account a matching increase in WEDG10 token balance.
+    /// Emits {Transfer} event to reflect WEDG10 token mint of `msg.value` from `address(0)` to `to` account.
     function depositTo(address to) external override payable {
         // _mintTo(to, msg.value);
         balanceOf[to] += msg.value;
         emit Transfer(address(0), to, msg.value);
     }
 
-    /// @dev `msg.value` of ETH sent to this contract grants `to` account a matching increase in WETH10 token balance,
+    /// @dev `msg.value` of ETH sent to this contract grants `to` account a matching increase in WEDG10 token balance,
     /// after which a call is executed to an ERC677-compliant contract with the `data` parameter.
     /// Emits {Transfer} event.
     /// Returns boolean value indicating whether operation succeeded.
@@ -110,20 +110,20 @@ contract WETH10 is IWETH10 {
         return ITransferReceiver(to).onTokenTransfer(msg.sender, msg.value, data);
     }
 
-    /// @dev Return the amount of WETH10 token that can be flash-lent.
+    /// @dev Return the amount of WEDG10 token that can be flash-lent.
     function maxFlashLoan(address token) external view override returns (uint256) {
         return token == address(this) ? type(uint112).max - flashMinted : 0; // Can't underflow
     }
 
-    /// @dev Return the fee (zero) for flash lending an amount of WETH10 token.
+    /// @dev Return the fee (zero) for flash lending an amount of WEDG10 token.
     function flashFee(address token, uint256) external view override returns (uint256) {
-        require(token == address(this), "WETH: flash mint only WETH10");
+        require(token == address(this), "WEDG: flash mint only WEDG10");
         return 0;
     }
 
-    /// @dev Flash lends `value` WETH10 token to the receiver address.
-    /// By the end of the transaction, `value` WETH10 token will be burned from the receiver.
-    /// The flash-minted WETH10 token is not backed by real ETH, but can be withdrawn as such up to the ETH balance of this contract.
+    /// @dev Flash lends `value` WEDG10 token to the receiver address.
+    /// By the end of the transaction, `value` WEDG10 token will be burned from the receiver.
+    /// The flash-minted WEDG10 token is not backed by real ETH, but can be withdrawn as such up to the ETH balance of this contract.
     /// Arbitrary data can be passed as a bytes calldata parameter.
     /// Emits {Approval} event to reflect reduced allowance `value` for this contract to spend from receiver account (`receiver`),
     /// unless allowance is set to `type(uint256).max`
@@ -133,10 +133,10 @@ contract WETH10 is IWETH10 {
     ///   - `value` must be less or equal to type(uint112).max.
     ///   - The total of all flash loans in a tx must be less or equal to type(uint112).max.
     function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 value, bytes calldata data) external override returns (bool) {
-        require(token == address(this), "WETH: flash mint only WETH10");
-        require(value <= type(uint112).max, "WETH: individual loan limit exceeded");
+        require(token == address(this), "WEDG: flash mint only WEDG10");
+        require(value <= type(uint112).max, "WEDG: individual loan limit exceeded");
         flashMinted = flashMinted + value;
-        require(flashMinted <= type(uint112).max, "WETH: total loan limit exceeded");
+        require(flashMinted <= type(uint112).max, "WEDG: total loan limit exceeded");
         
         // _mintTo(address(receiver), value);
         balanceOf[address(receiver)] += value;
@@ -144,13 +144,13 @@ contract WETH10 is IWETH10 {
 
         require(
             receiver.onFlashLoan(msg.sender, address(this), value, 0, data) == CALLBACK_SUCCESS,
-            "WETH: flash loan failed"
+            "WEDG: flash loan failed"
         );
         
         // _decreaseAllowance(address(receiver), address(this), value);
         uint256 allowed = allowance[address(receiver)][address(this)];
         if (allowed != type(uint256).max) {
-            require(allowed >= value, "WETH: request exceeds allowance");
+            require(allowed >= value, "WEDG: request exceeds allowance");
             uint256 reduced = allowed - value;
             allowance[address(receiver)][address(this)] = reduced;
             emit Approval(address(receiver), address(this), reduced);
@@ -158,7 +158,7 @@ contract WETH10 is IWETH10 {
 
         // _burnFrom(address(receiver), value);
         uint256 balance = balanceOf[address(receiver)];
-        require(balance >= value, "WETH: burn amount exceeds balance");
+        require(balance >= value, "WEDG: burn amount exceeds balance");
         balanceOf[address(receiver)] = balance - value;
         emit Transfer(address(receiver), address(0), value);
         
@@ -166,51 +166,51 @@ contract WETH10 is IWETH10 {
         return true;
     }
 
-    /// @dev Burn `value` WETH10 token from caller account and withdraw matching ETH to the same.
-    /// Emits {Transfer} event to reflect WETH10 token burn of `value` to `address(0)` from caller account. 
+    /// @dev Burn `value` WEDG10 token from caller account and withdraw matching ETH to the same.
+    /// Emits {Transfer} event to reflect WEDG10 token burn of `value` to `address(0)` from caller account. 
     /// Requirements:
-    ///   - caller account must have at least `value` balance of WETH10 token.
+    ///   - caller account must have at least `value` balance of WEDG10 token.
     function withdraw(uint256 value) external override {
         // _burnFrom(msg.sender, value);
         uint256 balance = balanceOf[msg.sender];
-        require(balance >= value, "WETH: burn amount exceeds balance");
+        require(balance >= value, "WEDG: burn amount exceeds balance");
         balanceOf[msg.sender] = balance - value;
         emit Transfer(msg.sender, address(0), value);
 
         // _transferEther(msg.sender, value);        
         (bool success, ) = msg.sender.call{value: value}("");
-        require(success, "WETH: ETH transfer failed");
+        require(success, "WEDG: ETH transfer failed");
     }
 
-    /// @dev Burn `value` WETH10 token from caller account and withdraw matching ETH to account (`to`).
-    /// Emits {Transfer} event to reflect WETH10 token burn of `value` to `address(0)` from caller account.
+    /// @dev Burn `value` WEDG10 token from caller account and withdraw matching ETH to account (`to`).
+    /// Emits {Transfer} event to reflect WEDG10 token burn of `value` to `address(0)` from caller account.
     /// Requirements:
-    ///   - caller account must have at least `value` balance of WETH10 token.
+    ///   - caller account must have at least `value` balance of WEDG10 token.
     function withdrawTo(address payable to, uint256 value) external override {
         // _burnFrom(msg.sender, value);
         uint256 balance = balanceOf[msg.sender];
-        require(balance >= value, "WETH: burn amount exceeds balance");
+        require(balance >= value, "WEDG: burn amount exceeds balance");
         balanceOf[msg.sender] = balance - value;
         emit Transfer(msg.sender, address(0), value);
 
         // _transferEther(to, value);        
         (bool success, ) = to.call{value: value}("");
-        require(success, "WETH: ETH transfer failed");
+        require(success, "WEDG: ETH transfer failed");
     }
 
-    /// @dev Burn `value` WETH10 token from account (`from`) and withdraw matching ETH to account (`to`).
+    /// @dev Burn `value` WEDG10 token from account (`from`) and withdraw matching ETH to account (`to`).
     /// Emits {Approval} event to reflect reduced allowance `value` for caller account to spend from account (`from`),
     /// unless allowance is set to `type(uint256).max`
-    /// Emits {Transfer} event to reflect WETH10 token burn of `value` to `address(0)` from account (`from`).
+    /// Emits {Transfer} event to reflect WEDG10 token burn of `value` to `address(0)` from account (`from`).
     /// Requirements:
-    ///   - `from` account must have at least `value` balance of WETH10 token.
-    ///   - `from` account must have approved caller to spend at least `value` of WETH10 token, unless `from` and caller are the same account.
+    ///   - `from` account must have at least `value` balance of WEDG10 token.
+    ///   - `from` account must have approved caller to spend at least `value` of WEDG10 token, unless `from` and caller are the same account.
     function withdrawFrom(address from, address payable to, uint256 value) external override {
         if (from != msg.sender) {
             // _decreaseAllowance(from, msg.sender, value);
             uint256 allowed = allowance[from][msg.sender];
             if (allowed != type(uint256).max) {
-                require(allowed >= value, "WETH: request exceeds allowance");
+                require(allowed >= value, "WEDG: request exceeds allowance");
                 uint256 reduced = allowed - value;
                 allowance[from][msg.sender] = reduced;
                 emit Approval(from, msg.sender, reduced);
@@ -219,16 +219,16 @@ contract WETH10 is IWETH10 {
         
         // _burnFrom(from, value);
         uint256 balance = balanceOf[from];
-        require(balance >= value, "WETH: burn amount exceeds balance");
+        require(balance >= value, "WEDG: burn amount exceeds balance");
         balanceOf[from] = balance - value;
         emit Transfer(from, address(0), value);
 
         // _transferEther(to, value);        
         (bool success, ) = to.call{value: value}("");
-        require(success, "WETH: Ether transfer failed");
+        require(success, "WEDG: Ether transfer failed");
     }
 
-    /// @dev Sets `value` as allowance of `spender` account over caller account's WETH10 token.
+    /// @dev Sets `value` as allowance of `spender` account over caller account's WEDG10 token.
     /// Emits {Approval} event.
     /// Returns boolean value indicating whether operation succeeded.
     function approve(address spender, uint256 value) external override returns (bool) {
@@ -239,7 +239,7 @@ contract WETH10 is IWETH10 {
         return true;
     }
 
-    /// @dev Sets `value` as allowance of `spender` account over caller account's WETH10 token,
+    /// @dev Sets `value` as allowance of `spender` account over caller account's WEDG10 token,
     /// after which a call is executed to an ERC677-compliant contract with the `data` parameter.
     /// Emits {Approval} event.
     /// Returns boolean value indicating whether operation succeeded.
@@ -252,7 +252,7 @@ contract WETH10 is IWETH10 {
         return IApprovalReceiver(spender).onTokenApproval(msg.sender, value, data);
     }
 
-    /// @dev Sets `value` as allowance of `spender` account over `owner` account's WETH10 token, given `owner` account's signed approval.
+    /// @dev Sets `value` as allowance of `spender` account over `owner` account's WEDG10 token, given `owner` account's signed approval.
     /// Emits {Approval} event.
     /// Requirements:
     ///   - `deadline` must be timestamp in future.
@@ -260,9 +260,9 @@ contract WETH10 is IWETH10 {
     ///   - the signature must use `owner` account's current nonce (see {nonces}).
     ///   - the signer cannot be `address(0)` and must be `owner` account.
     /// For more information on signature format, see https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP section].
-    /// WETH10 token implementation adapted from https://github.com/albertocuestacanada/ERC20Permit/blob/master/contracts/ERC20Permit.sol.
+    /// WEDG10 token implementation adapted from https://github.com/albertocuestacanada/ERC20Permit/blob/master/contracts/ERC20Permit.sol.
     function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external override {
-        require(block.timestamp <= deadline, "WETH: Expired permit");
+        require(block.timestamp <= deadline, "WEDG: Expired permit");
 
         uint256 chainId;
         assembly {chainId := chainid()}
@@ -283,57 +283,57 @@ contract WETH10 is IWETH10 {
                 hashStruct));
 
         address signer = ecrecover(hash, v, r, s);
-        require(signer != address(0) && signer == owner, "WETH: invalid permit");
+        require(signer != address(0) && signer == owner, "WEDG: invalid permit");
 
         // _approve(owner, spender, value);
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
 
-    /// @dev Moves `value` WETH10 token from caller's account to account (`to`).
-    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WETH10 token in favor of caller.
+    /// @dev Moves `value` WEDG10 token from caller's account to account (`to`).
+    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WEDG10 token in favor of caller.
     /// Emits {Transfer} event.
     /// Returns boolean value indicating whether operation succeeded.
     /// Requirements:
-    ///   - caller account must have at least `value` WETH10 token.
+    ///   - caller account must have at least `value` WEDG10 token.
     function transfer(address to, uint256 value) external override returns (bool) {
         // _transferFrom(msg.sender, to, value);
         if (to != address(0)) { // Transfer
             uint256 balance = balanceOf[msg.sender];
-            require(balance >= value, "WETH: transfer amount exceeds balance");
+            require(balance >= value, "WEDG: transfer amount exceeds balance");
 
             balanceOf[msg.sender] = balance - value;
             balanceOf[to] += value;
             emit Transfer(msg.sender, to, value);
         } else { // Withdraw
             uint256 balance = balanceOf[msg.sender];
-            require(balance >= value, "WETH: burn amount exceeds balance");
+            require(balance >= value, "WEDG: burn amount exceeds balance");
             balanceOf[msg.sender] = balance - value;
             emit Transfer(msg.sender, address(0), value);
             
             (bool success, ) = msg.sender.call{value: value}("");
-            require(success, "WETH: ETH transfer failed");
+            require(success, "WEDG: ETH transfer failed");
         }
         
         return true;
     }
 
-    /// @dev Moves `value` WETH10 token from account (`from`) to account (`to`) using allowance mechanism.
+    /// @dev Moves `value` WEDG10 token from account (`from`) to account (`to`) using allowance mechanism.
     /// `value` is then deducted from caller account's allowance, unless set to `type(uint256).max`.
-    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WETH10 token in favor of caller.
+    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WEDG10 token in favor of caller.
     /// Emits {Approval} event to reflect reduced allowance `value` for caller account to spend from account (`from`),
     /// unless allowance is set to `type(uint256).max`
     /// Emits {Transfer} event.
     /// Returns boolean value indicating whether operation succeeded.
     /// Requirements:
-    ///   - `from` account must have at least `value` balance of WETH10 token.
-    ///   - `from` account must have approved caller to spend at least `value` of WETH10 token, unless `from` and caller are the same account.
+    ///   - `from` account must have at least `value` balance of WEDG10 token.
+    ///   - `from` account must have approved caller to spend at least `value` of WEDG10 token, unless `from` and caller are the same account.
     function transferFrom(address from, address to, uint256 value) external override returns (bool) {
         if (from != msg.sender) {
             // _decreaseAllowance(from, msg.sender, value);
             uint256 allowed = allowance[from][msg.sender];
             if (allowed != type(uint256).max) {
-                require(allowed >= value, "WETH: request exceeds allowance");
+                require(allowed >= value, "WEDG: request exceeds allowance");
                 uint256 reduced = allowed - value;
                 allowance[from][msg.sender] = reduced;
                 emit Approval(from, msg.sender, reduced);
@@ -343,49 +343,49 @@ contract WETH10 is IWETH10 {
         // _transferFrom(from, to, value);
         if (to != address(0)) { // Transfer
             uint256 balance = balanceOf[from];
-            require(balance >= value, "WETH: transfer amount exceeds balance");
+            require(balance >= value, "WEDG: transfer amount exceeds balance");
 
             balanceOf[from] = balance - value;
             balanceOf[to] += value;
             emit Transfer(from, to, value);
         } else { // Withdraw
             uint256 balance = balanceOf[from];
-            require(balance >= value, "WETH: burn amount exceeds balance");
+            require(balance >= value, "WEDG: burn amount exceeds balance");
             balanceOf[from] = balance - value;
             emit Transfer(from, address(0), value);
         
             (bool success, ) = msg.sender.call{value: value}("");
-            require(success, "WETH: ETH transfer failed");
+            require(success, "WEDG: ETH transfer failed");
         }
         
         return true;
     }
 
-    /// @dev Moves `value` WETH10 token from caller's account to account (`to`), 
+    /// @dev Moves `value` WEDG10 token from caller's account to account (`to`), 
     /// after which a call is executed to an ERC677-compliant contract with the `data` parameter.
-    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WETH10 token in favor of caller.
+    /// A transfer to `address(0)` triggers an ETH withdraw matching the sent WEDG10 token in favor of caller.
     /// Emits {Transfer} event.
     /// Returns boolean value indicating whether operation succeeded.
     /// Requirements:
-    ///   - caller account must have at least `value` WETH10 token.
+    ///   - caller account must have at least `value` WEDG10 token.
     /// For more information on {transferAndCall} format, see https://github.com/ethereum/EIPs/issues/677.
     function transferAndCall(address to, uint value, bytes calldata data) external override returns (bool) {
         // _transferFrom(msg.sender, to, value);
         if (to != address(0)) { // Transfer
             uint256 balance = balanceOf[msg.sender];
-            require(balance >= value, "WETH: transfer amount exceeds balance");
+            require(balance >= value, "WEDG: transfer amount exceeds balance");
 
             balanceOf[msg.sender] = balance - value;
             balanceOf[to] += value;
             emit Transfer(msg.sender, to, value);
         } else { // Withdraw
             uint256 balance = balanceOf[msg.sender];
-            require(balance >= value, "WETH: burn amount exceeds balance");
+            require(balance >= value, "WEDG: burn amount exceeds balance");
             balanceOf[msg.sender] = balance - value;
             emit Transfer(msg.sender, address(0), value);
         
             (bool success, ) = msg.sender.call{value: value}("");
-            require(success, "WETH: ETH transfer failed");
+            require(success, "WEDG: ETH transfer failed");
         }
 
         return ITransferReceiver(to).onTokenTransfer(msg.sender, value, data);
